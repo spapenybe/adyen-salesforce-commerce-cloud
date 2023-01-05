@@ -6,7 +6,7 @@ var adyenCheckout = require('./adyenCheckout');
 var billing = require('./checkout/billing');
 
 // Compatibility Adyen SFRA 5.x.x & 6.x.x
-var checkout = window.AdyenSFRA6Enabled !== 'null' ? require('./checkout/checkoutSFRA6') : require('./checkout/checkoutSFRA5');
+var checkout = require('./checkout/checkoutSFRA5');
 $(document).ready(function () {
   // eslint-disable-line
   var name = 'paymentError';

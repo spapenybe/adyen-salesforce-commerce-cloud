@@ -6,3 +6,5 @@ dw.json
 /coverage/
 screenshots/
 playwright-report/
+cartridges/int_adyen_SFRA/cartridge/static/*/css/
+cartridges/int_adyen_SFRA/cartridge/static/*/js/

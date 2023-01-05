@@ -90,14 +90,32 @@ function handlePayment(options) {
   return options.isStored ? setNode(options.paymentMethodID)('card', options.paymentMethod) : handleFallbackPayment(options);
 }
 function getListContents(_ref2) {
-  var imagePath = _ref2.imagePath,
+    var imagePath = _ref2.imagePath,
     isStored = _ref2.isStored,
     paymentMethod = _ref2.paymentMethod,
-    description = _ref2.description;
-  var paymentMethodID = getPaymentMethodID(isStored, paymentMethod);
-  var label = getLabel(isStored, paymentMethod);
-  var liContents = "\n    <input name=\"brandCode\" type=\"radio\" value=\"".concat(paymentMethodID, "\" id=\"rb_").concat(paymentMethodID, "\">\n    <img class=\"paymentMethod_img\" src=\"").concat(imagePath, "\" ></img>\n    <label id=\"lb_").concat(paymentMethodID, "\" for=\"rb_").concat(paymentMethodID, "\">").concat(label, "</label>\n  ");
-  return description ? "".concat(liContents, "<p>").concat(description, "</p>") : liContents;
+    path = _ref2.path;
+    var paymentMethodID = getPaymentMethodID(isStored, paymentMethod);
+    var isSchemeNotStored = paymentMethod.type === 'scheme' && !isStored;
+    var paymentMethodImage = isStored ? "".concat(path).concat(paymentMethod.brand, ".png") : "".concat(path).concat(paymentMethod.type, ".png");
+    var cardImage = "".concat(path, "card.png");
+    var imagePath = isSchemeNotStored ? cardImage : paymentMethodImage;
+
+    var $checkbox = $('<div class="checkbox-wrapper"/>');
+    $checkbox.append($('<input>')
+        .addClass('custom-control-input')
+        .attr('id', 'rb_' + paymentMethodID)
+        .attr('type', 'radio')
+        .attr('name', 'brandCode')
+        .attr('value', paymentMethodID));
+
+    $checkbox.append($('<label>').addClass('custom-checkbox-label').attr('for', 'rb_' + paymentMethodID));
+    $checkbox.append($('<label>')
+        .addClass('form-check-label')
+        .text((name || paymentMethod.name) + (paymentMethod.lastFour ?` ${MASKED_CC_PREFIX + paymentMethod.lastFour}` : ''))
+        .attr('for', 'rb_' + paymentMethodID)
+        .attr('id','lb_' + paymentMethodID));
+    $checkbox.append($('<img>').addClass('paymentMethod_img').attr('src', imagePath));
+    return $checkbox;
 }
 function getImagePath(_ref3) {
   var isStored = _ref3.isStored,
@@ -149,7 +167,7 @@ module.exports.renderPaymentMethod = function renderPaymentMethod(paymentMethod,
   var _store$componentsObj$;
   var description = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
   var rerender = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
-  var paymentMethodsUI = document.querySelector('#paymentMethodsList');
+  var paymentMethodsUI = $('#paymentMethodsList');
   var paymentMethodID = getPaymentMethodID(isStored, paymentMethod);
   if (paymentMethodID === constants.GIFTCARD) {
     return;
@@ -174,9 +192,11 @@ module.exports.renderPaymentMethod = function renderPaymentMethod(paymentMethod,
   if (rerender) {
     li = document.querySelector("#rb_".concat(paymentMethodID)).closest('li');
   } else {
-    li = document.createElement('li');
-    li.innerHTML = liContents;
-    li.classList.add('paymentMethod');
+    li = $('<li>').addClass('paymentMethod');
+    li.append(liContents);
+    if (description) {
+        li.append($('<p>').text(description));
+    }
     paymentMethodsUI.append(li);
   }
   handlePayment(options);
