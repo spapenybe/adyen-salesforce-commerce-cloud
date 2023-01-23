@@ -332,6 +332,7 @@ var adyenHelperObj = {
     stateData.returnUrl = URLUtils.https('Adyen-ShowConfirmation', 'merchantReference', reference, 'signature', signature, 'orderToken', orderToken).toString();
     stateData.applicationInfo = adyenHelperObj.getApplicationInfo();
     stateData.additionalData = {};
+    stateData.enableRecurring = false;
     return stateData;
   },
   createSignature: function createSignature(paymentInstrument, value, salt) {
