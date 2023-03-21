@@ -92,11 +92,11 @@ function getGooglePayConfig() {
   };
 }
 function handlePartialPaymentSuccess() {
-  var _getGiftCardElements = getGiftCardElements(),
-    giftCardSelectContainer = _getGiftCardElements.giftCardSelectContainer,
-    giftCardSelect = _getGiftCardElements.giftCardSelect;
-  giftCardSelectContainer.classList.add('invisible');
-  giftCardSelect.value = null;
+  // var _getGiftCardElements = getGiftCardElements(),
+  //  giftCardSelectContainer = _getGiftCardElements.giftCardSelectContainer,
+  //  giftCardSelect = _getGiftCardElements.giftCardSelect;
+  // giftCardSelectContainer.classList.add('invisible');
+  // giftCardSelect.value = null;
   store.componentsObj.giftcard.node.unmount('component_giftcard');
   renderAddedGiftCard();
   createElementsToShowRemainingGiftCardAmount();
@@ -148,9 +148,10 @@ function getGiftCardConfig() {
         success: function success(data) {
           if (data.resultCode === 'Success') {
             // make payments call including giftcard data and order data
-            var brandSelect = document.getElementById('giftCardSelect');
-            var selectedBrandIndex = brandSelect.selectedIndex;
-            var giftcardBrand = brandSelect.options[selectedBrandIndex].text;
+            // var brandSelect = document.getElementById('giftCardSelect');
+            // var selectedBrandIndex = brandSelect.selectedIndex;
+            // var giftcardBrand = brandSelect.options[selectedBrandIndex].text;
+            var giftcardBrand = 'genericgiftcard';
             var partialPaymentRequest = {
               paymentMethod: giftCardData,
               amount: giftcardBalance,

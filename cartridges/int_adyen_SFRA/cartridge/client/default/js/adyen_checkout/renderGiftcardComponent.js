@@ -75,44 +75,12 @@ function attachGiftCardFormListeners() {
     });
   }
   if (giftCardAddButton) {
-    giftCardAddButton.addEventListener('click', function (event) {
-      /*
-      giftCardAddButton.setAttribute('click-listener', 'true');
-      if (store.partialPaymentsOrderObj) {
-        return;
-      }
-      var giftCardWarningMessageEl = document.querySelector('#giftCardWarningMessage');
-      if (giftCardWarningMessageEl) {
-        giftCardWarningMessageEl.style.display = 'none';
-      }
-      giftCardAddButton.style.display = 'none';
-      giftCardSelectContainer.classList.remove('invisible');
-      */
-      var _store$partialPayment;
-      var selectedGiftCard = {
-        name: event.target.dataset.name,
-        brand: event.target.dataset.brand,
-        type: event.target.dataset.type
-      };
-      if (selectedGiftCard.brand !== ((_store$partialPayment = store.partialPaymentsOrderObj) === null || _store$partialPayment === void 0 ? void 0 : _store$partialPayment.giftcard.brand)) {
-        var _store$componentsObj;
-        if ((_store$componentsObj = store.componentsObj) !== null && _store$componentsObj !== void 0 && _store$componentsObj.giftcard) {
-          store.componentsObj.giftcard.node.unmount('component_giftcard');
-        }
-        if (!store.partialPaymentsOrderObj) {
-          store.partialPaymentsOrderObj = {};
-        }
-        store.partialPaymentsOrderObj.giftcard = selectedGiftCard;
-        // giftCardSelect.value = selectedGiftCard.brand;
+    giftCardAddButton.addEventListener('click', function () {
+      if(giftCardAddButton.checked) {
+        renderGiftCardSelectForm();        
+      } else {
+        removeGiftCard();
         giftCardContainer.innerHTML = '';
-        var giftCardNode = store.checkout.create(constants.GIFTCARD, _objectSpread(_objectSpread({}, store.checkoutConfiguration.giftcard), {}, {
-          brand: selectedGiftCard.brand,
-          name: selectedGiftCard.name
-        })).mount(giftCardContainer);
-        store.componentsObj.giftcard = {
-          node: giftCardNode
-        };
-        giftCardAddButton.classList.add('invisible');
       }
     });
   }
@@ -127,44 +95,42 @@ function removeGiftCardFormListeners() {
     giftCardUl = _getGiftCardElements2.giftCardUl,
     giftCardSelect = _getGiftCardElements2.giftCardSelect,
     giftCardAddButton = _getGiftCardElements2.giftCardAddButton;
-  giftCardUl.replaceWith(giftCardUl.cloneNode(true));
-  giftCardSelect.replaceWith(giftCardSelect.cloneNode(true));
+  // giftCardUl.replaceWith(giftCardUl.cloneNode(true));
+  // giftCardSelect.replaceWith(giftCardSelect.cloneNode(true));
   giftCardAddButton.replaceWith(giftCardAddButton.cloneNode(true));
   store.giftCardComponentListenersAdded = false;
 }
 function renderGiftCardSelectForm() {
-  var _getGiftCardElements3 = getGiftCardElements(),
-    giftCardSelect = _getGiftCardElements3.giftCardSelect,
-    giftCardUl = _getGiftCardElements3.giftCardUl;
-  if (giftCardUl !== null && giftCardUl !== void 0 && giftCardUl.innerHTML) {
+  attachGiftCardFormListeners();
+  var _getGiftCardElements = getGiftCardElements(),
+    giftCardContainer = _getGiftCardElements.giftCardContainer,
+    giftCardAddButton = _getGiftCardElements.giftCardAddButton;
+  var adyenPartialPaymentsOrder = document.querySelector('#adyenPartialPaymentsOrder');
+  if (adyenPartialPaymentsOrder.value || !giftCardAddButton.checked) {
     return;
   }
-  var paymentMethodsResponse = store.checkout.paymentMethodsResponse;
-  var imagePath = store.checkoutConfiguration.session.imagePath;
-  var giftCardBrands = paymentMethodsResponse.paymentMethods.filter(function (pm) {
-    return pm.type === constants.GIFTCARD;
-  });
-  giftCardBrands.forEach(function (giftCard) {
-    var newListItem = document.createElement('li');
-    newListItem.setAttribute('data-brand', giftCard.brand);
-    newListItem.setAttribute('data-name', giftCard.name);
-    newListItem.setAttribute('data-type', giftCard.type);
-    var span = document.createElement('span');
-    span.textContent = giftCard.name;
-    var img = document.createElement('img');
-    img.src = "".concat(imagePath).concat(giftCard.brand, ".png");
-    img.width = 40;
-    img.height = 26;
-    newListItem.appendChild(span);
-    newListItem.appendChild(img);
-    // giftCardUl.appendChild(newListItem);
-    var newOption = document.createElement('option');
-    newOption.textContent = giftCard.name;
-    newOption.value = giftCard.brand;
-    newOption.style.visibility = 'hidden';
-    // giftCardSelect.appendChild(newOption);
-  });
-  attachGiftCardFormListeners();
+  var selectedGiftCard = {
+    name: giftCardAddButton.dataset.name,
+    brand: giftCardAddButton.dataset.brand,
+    type: giftCardAddButton.dataset.type
+  };
+  giftCardAddButton.checked = true;
+  var _store$componentsObj;
+  if ((_store$componentsObj = store.componentsObj) !== null && _store$componentsObj !== void 0 && _store$componentsObj.giftcard) {
+    store.componentsObj.giftcard.node.unmount('component_giftcard');
+  }
+  if (!store.partialPaymentsOrderObj) {
+    store.partialPaymentsOrderObj = {};
+  }
+  store.partialPaymentsOrderObj.giftcard = selectedGiftCard;
+  giftCardContainer.innerHTML = '';
+  var giftCardNode = store.checkout.create(constants.GIFTCARD, _objectSpread(_objectSpread({}, store.checkoutConfiguration.giftcard), {}, {
+    brand: selectedGiftCard.brand,
+    name: selectedGiftCard.name
+  })).mount(giftCardContainer);
+  store.componentsObj.giftcard = {
+    node: giftCardNode
+  };
 }
 function removeGiftCard() {
   $.ajax({
@@ -183,8 +149,8 @@ function removeGiftCard() {
       adyenPartialPaymentsOrder.value = null;
       giftCardsList.innerHTML = '';
       giftCardAddButton.style.display = 'block';
-      giftCardSelect.value = null;
-      giftCardUl.innerHTML = '';
+      // giftCardSelect.value = null;
+      // giftCardUl.innerHTML = '';
       store.partialPaymentsOrderObj = null;
       window.sessionStorage.removeItem(constants.GIFTCARD_DATA_ADDED);
       if (res.resultCode === constants.RECEIVED) {
@@ -196,27 +162,18 @@ function removeGiftCard() {
   });
 }
 function renderAddedGiftCard() {
-  var giftCardData = store.partialPaymentsOrderObj.giftcard;
-  var imagePath = store.checkoutConfiguration.session.imagePath;
   var _getGiftCardElements5 = getGiftCardElements(),
     giftCardsList = _getGiftCardElements5.giftCardsList,
     giftCardAddButton = _getGiftCardElements5.giftCardAddButton;
+  giftCardAddButton.checked = true;
   var giftCardDiv = document.createElement('div');
-  giftCardDiv.classList.add('gift-card');
-  var brandContainer = document.createElement('div');
-  brandContainer.classList.add('brand-container');
-  var giftCardImg = document.createElement('img');
-  var giftCardImgSrc = "".concat(imagePath).concat(giftCardData.brand, ".png");
-  giftCardImg.setAttribute('src', giftCardImgSrc);
-  giftCardImg.classList.add('gift-card-logo');
-  var giftCardNameP = document.createElement('p');
-  giftCardNameP.textContent = giftCardData.name;
-  brandContainer.appendChild(giftCardImg);
-  brandContainer.appendChild(giftCardNameP);
+  giftCardDiv.classList.add('gift-card', 'd-flex', 'align-items-center');
   var giftCardAction = document.createElement('div');
-  giftCardAction.classList.add('gift-card-action');
+  giftCardAction.classList.add('gift-card-action', 'remove-button', 'mr-2');
   var removeAnchor = document.createElement('a');
-  removeAnchor.textContent = window.removeGiftCardButtonText;
+  var removeIcon = document.createElement('div');
+  removeIcon.classList.add('icon', 'icon-small', 'icon-cross');
+  removeAnchor.appendChild(removeIcon);
   removeAnchor.addEventListener('click', function () {
     removeGiftCard();
     renderGiftCardSelectForm();
@@ -224,7 +181,6 @@ function renderAddedGiftCard() {
   giftCardAction.appendChild(removeAnchor);
   var brandAndRemoveActionWrapper = document.createElement('div');
   brandAndRemoveActionWrapper.classList.add('wrapper');
-  brandAndRemoveActionWrapper.appendChild(brandContainer);
   brandAndRemoveActionWrapper.appendChild(giftCardAction);
   var giftCardAmountDiv = document.createElement('div');
   giftCardAmountDiv.classList.add('wrapper');
@@ -232,13 +188,12 @@ function renderAddedGiftCard() {
   amountLabel.textContent = window.discountedAmountGiftCardResource;
   var amountValue = document.createElement('strong');
   amountValue.textContent = store.partialPaymentsOrderObj.discountedAmount;
-  giftCardAmountDiv.appendChild(amountLabel);
   giftCardAmountDiv.appendChild(amountValue);
   giftCardDiv.appendChild(brandAndRemoveActionWrapper);
   giftCardDiv.appendChild(giftCardAmountDiv);
   giftCardsList.appendChild(giftCardDiv);
   giftCardAddButton.style.display = 'none';
-  removeGiftCardFormListeners();
+  // removeGiftCardFormListeners();
 }
 function createElementsToShowRemainingGiftCardAmount() {
   var mainContainer = document.createElement('div');
@@ -268,8 +223,8 @@ function createElementsToShowRemainingGiftCardAmount() {
   discountedAmountEnd.classList.add('col-6', 'end-lines');
   discountedAmountStartP.classList.add('order-receipt-label');
   cancelGiftCardP.classList.add('order-receipt-label');
-  remainingAmountEndP.classList.add('text-right');
-  discountedAmountEndP.classList.add('text-right');
+  remainingAmountEndP.classList.add('text-right', 'order-receipt-price');
+  discountedAmountEndP.classList.add('text-right', 'order-receipt-price');
   cancelGiftCard.id = 'cancelGiftCardContainer';
   cancelGiftCard.role = 'button';
   discountedAmountContainer.id = 'discountedAmountContainer';
@@ -279,7 +234,7 @@ function createElementsToShowRemainingGiftCardAmount() {
   cancelGiftCardSpan.innerText = window.cancelGiftCardResource;
   remainingAmountEndSpan.innerText = store.partialPaymentsOrderObj.remainingAmount;
   discountedAmountEndSpan.innerText = store.partialPaymentsOrderObj.discountedAmount;
-  cancelGiftCard.addEventListener('click', function () {
+  cancelGiftCard.addEventListener('click', function (event) {
     removeGiftCard();
     renderGiftCardSelectForm();
   });
@@ -298,7 +253,7 @@ function createElementsToShowRemainingGiftCardAmount() {
   cancelGiftCardP.appendChild(cancelGiftCardSpan);
   remainingAmountEndP.appendChild(remainingAmountEndSpan);
   discountedAmountEndP.appendChild(discountedAmountEndSpan);
-  var pricingContainer = document.querySelector('.card-body.order-total-summary');
+  var pricingContainer = document.querySelector('.card-body .order-total-summary');
   mainContainer.appendChild(discountedAmountContainer);
   mainContainer.appendChild(remainingAmountContainer);
   mainContainer.appendChild(cancelGiftCard);
